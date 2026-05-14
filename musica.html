@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi Mundo Musical</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black:  #080808;
+      --g9:     #111111;
+      --g8:     #1C1C1C;
+      --g7:     #2A2A2A;
+      --g6:     #3E3E3E;
+      --g5:     #5A5A5A;
+      --g4:     #888888;
+      --g3:     #ADADAD;
+      --g2:     #D0D0D0;
+      --g1:     #E8E8E8;
+      --white:  #F4F2EE;
+
+      /* colores de rating */
+      --fav-glow:  rgba(255,255,255,0.85);
+      --bad-glow:  rgba(200,60,60,0.75);
+      --int-glow:  rgba(60,130,220,0.75);
+
+      --font-d: 'Bebas Neue', sans-serif;
+      --font-s: 'Playfair Display', serif;
+      --font-b: 'Cormorant Garamond', serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { background:var(--black); color:var(--g2); font-family:var(--font-b); overflow-x:hidden; }
+
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-track { background:var(--g9); }
+    ::-webkit-scrollbar-thumb { background:var(--g5); border-radius:3px; }
+
+    /* ===== NAV ===== */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 3rem; height:60px;
+      background:rgba(8,8,8,0.92); backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .nav-brand { font-family:var(--font-d); font-size:1rem; letter-spacing:0.35em; color:var(--g2); }
+    .nav-links { display:flex; align-items:center; }
+    .nav-links a {
+      font-family:var(--font-d); letter-spacing:0.15em; font-size:0.72rem;
+      color:var(--g5); text-decoration:none; padding:0 1rem;
+      height:60px; display:flex; align-items:center; position:relative; transition:color 0.25s;
+    }
+    .nav-links a::after { content:''; position:absolute; bottom:0; left:50%; right:50%; height:1px; background:var(--g2); transition:left 0.3s, right 0.3s; }
+    .nav-links a:hover { color:var(--white); }
+    .nav-links a:hover::after { left:1rem; right:1rem; }
+    .nav-toggle { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; background:none; border:none; }
+    .nav-toggle span { display:block; width:22px; height:1px; background:var(--g3); transition:transform 0.3s,opacity 0.3s; }
+    .nav-toggle.open span:nth-child(1) { transform:translateY(6px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity:0; }
+    .nav-toggle.open span:nth-child(3) { transform:translateY(-6px) rotate(-45deg); }
+    @media(max-width:768px) {
+      nav { padding:0 1.5rem; }
+      .nav-toggle { display:flex; }
+      .nav-links { position:fixed; top:60px; left:0; right:0; flex-direction:column; background:rgba(8,8,8,0.97); backdrop-filter:blur(14px); border-bottom:1px solid rgba(255,255,255,0.06); max-height:0; overflow:hidden; transition:max-height 0.4s ease; }
+      .nav-links.open { max-height:600px; }
+      .nav-links a { height:48px; width:100%; border-bottom:1px solid rgba(255,255,255,0.04); padding:0 2rem; }
+      .nav-links a::after { display:none; }
+    }
+
+    /* ===== SECTION BASE ===== */
+    section { min-height:100vh; padding:8rem 5rem 6rem; position:relative; }
+    .section-label { font-family:var(--font-d); font-size:0.68rem; letter-spacing:0.5em; color:var(--g5); margin-bottom:0.75rem; }
+    .section-title { font-family:var(--font-s); font-size:clamp(2.5rem,6vw,5rem); font-weight:900; line-height:1; color:var(--white); margin-bottom:1.5rem; }
+    .section-title em { font-style:italic; color:var(--g3); }
+    .deco-line { width:60px; height:1px; background:var(--g6); margin-bottom:3rem; }
+
+    /* ================================================
+       PORTADA
+       ================================================ */
+    #portada {
+      background:var(--black); display:flex; flex-direction:column;
+      align-items:center; justify-content:center; text-align:center;
+      min-height:100vh; overflow:hidden; padding:6rem 3rem;
+    }
+    #portada::before {
+      content:''; position:absolute; inset:0;
+      background-image:radial-gradient(circle,rgba(255,255,255,0.04) 1px,transparent 1px);
+      background-size:40px 40px;
+      animation:gridDrift 25s linear infinite; pointer-events:none;
+    }
+    @keyframes gridDrift { 0%{background-position:0 0} 100%{background-position:40px 40px} }
+    .portada-orb { position:absolute; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(255,255,255,0.04) 0%,transparent 65%); animation:orbPulse 6s ease-in-out infinite alternate; pointer-events:none; }
+    @keyframes orbPulse { from{transform:scale(0.9);opacity:0.6} to{transform:scale(1.1);opacity:1} }
+    .portada-eyebrow { font-family:var(--font-d); font-size:0.72rem; letter-spacing:0.55em; color:var(--g5); margin-bottom:2rem; opacity:0; transform:translateY(20px); animation:heroUp 0.8s ease forwards 0.2s; position:relative; z-index:1; }
+    .portada-headline { font-family:var(--font-s); font-size:clamp(4.5rem,13vw,12rem); font-weight:900; line-height:0.9; color:var(--white); margin-bottom:0.3rem; opacity:0; transform:translateY(30px); animation:heroUp 1s ease forwards 0.5s; position:relative; z-index:1; }
+    .portada-headline-sub { font-family:var(--font-s); font-size:clamp(3rem,9vw,8rem); font-weight:400; font-style:italic; line-height:1; color:var(--g3); margin-bottom:3rem; opacity:0; transform:translateY(30px); animation:heroUp 1s ease forwards 0.75s; position:relative; z-index:1; }
+    .portada-rule { width:80px; height:1px; background:linear-gradient(to right,transparent,var(--g4),transparent); margin:0 auto 2.5rem; opacity:0; animation:heroFade 1s ease forwards 1.1s; position:relative; z-index:1; }
+    .portada-desc { max-width:560px; font-size:1.2rem; line-height:1.9; font-weight:300; color:var(--g4); margin-bottom:2.5rem; opacity:0; transform:translateY(20px); animation:heroUp 1s ease forwards 1.3s; position:relative; z-index:1; }
+    .portada-quote { font-size:0.92rem; font-style:italic; color:var(--g6); letter-spacing:0.04em; opacity:0; animation:heroFade 1s ease forwards 1.7s; position:relative; z-index:1; }
+    .portada-scroll { position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:0.5rem; opacity:0; animation:heroFade 1s ease forwards 2.1s; z-index:1; }
+    .portada-scroll span { font-family:var(--font-d); font-size:0.6rem; letter-spacing:0.4em; color:var(--g6); }
+    .portada-scroll-line { width:1px; height:40px; background:linear-gradient(to bottom,var(--g6),transparent); animation:scrollLine 2s ease-in-out infinite; }
+    @keyframes scrollLine { 0%{transform:scaleY(0);transform-origin:top} 50%{transform:scaleY(1);transform-origin:top} 51%{transform:scaleY(1);transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom} }
+    @keyframes heroUp { to{opacity:1;transform:translateY(0)} }
+    @keyframes heroFade { to{opacity:1} }
+
+    /* ================================================
+       ÁLBUMES ESCUCHADOS — con rating de color
+       ================================================ */
+    #albumes { background:var(--g9); }
+
+    /* Leyenda */
+    .album-legend {
+      display:flex; gap:2rem; margin-bottom:2.5rem; flex-wrap:wrap;
+    }
+    .legend-item {
+      display:flex; align-items:center; gap:0.6rem;
+      font-family:var(--font-d); font-size:0.65rem; letter-spacing:0.2em; color:var(--g5);
+    }
+    .legend-dot {
+      width:10px; height:10px; border-radius:50%;
+    }
+    .legend-dot.fav  { background:var(--white); box-shadow:0 0 8px var(--white); }
+    .legend-dot.bad  { background:#C83C3C; box-shadow:0 0 8px rgba(200,60,60,0.7); }
+    .legend-dot.int  { background:#3C82DC; box-shadow:0 0 8px rgba(60,130,220,0.7); }
+    .legend-dot.neu  { background:var(--g6); }
+
+    .albums-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1.2rem; }
+
+    .album-card {
+      background:var(--g8); border:1px solid rgba(255,255,255,0.05);
+      overflow:hidden; transition:transform 0.3s, box-shadow 0.3s, border-color 0.3s; cursor:pointer;
+      position:relative;
+    }
+    .album-card:hover { transform:translateY(-4px); }
+
+    /* Rating rings */
+    .album-card.fav  { box-shadow:0 0 0 1px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.25); }
+    .album-card.bad  { box-shadow:0 0 0 1px rgba(200,60,60,0.4), 0 0 20px rgba(200,60,60,0.12); border-color:rgba(200,60,60,0.3); }
+    .album-card.int  { box-shadow:0 0 0 1px rgba(60,130,220,0.4), 0 0 20px rgba(60,130,220,0.12); border-color:rgba(60,130,220,0.3); }
+
+    .album-card.fav:hover { box-shadow:0 0 0 1px rgba(255,255,255,0.5), 0 0 35px rgba(255,255,255,0.2); }
+    .album-card.bad:hover { box-shadow:0 0 0 1px rgba(200,60,60,0.6), 0 0 35px rgba(200,60,60,0.2); }
+    .album-card.int:hover { box-shadow:0 0 0 1px rgba(60,130,220,0.6), 0 0 35px rgba(60,130,220,0.2); }
+
+    /* Dot indicador de rating en esquina */
+    .album-card::after {
+      content:''; position:absolute; top:8px; right:8px;
+      width:8px; height:8px; border-radius:50%; opacity:0.85;
+    }
+    .album-card.fav::after { background:var(--white); box-shadow:0 0 6px var(--white); }
+    .album-card.bad::after { background:#C83C3C; box-shadow:0 0 6px #C83C3C; }
+    .album-card.int::after { background:#3C82DC; box-shadow:0 0 6px #3C82DC; }
+
+    .album-cover { width:100%; aspect-ratio:1; background:var(--g7); display:flex; align-items:center; justify-content:center; font-size:3rem; color:var(--g5); overflow:hidden; }
+    .album-cover img { width:100%; height:100%; object-fit:cover; filter:grayscale(30%); transition:filter 0.4s; }
+    .album-card:hover .album-cover img { filter:grayscale(0%); }
+    .album-info { padding:0.8rem 1rem 1rem; }
+    .album-title { font-family:var(--font-s); font-size:0.92rem; font-weight:700; color:var(--g1); margin-bottom:0.2rem; }
+    .album-artist { font-size:0.8rem; color:var(--g5); font-style:italic; }
+    .album-year { font-family:var(--font-d); font-size:0.65rem; letter-spacing:0.15em; color:var(--g6); margin-top:0.3rem; }
+    .add-card { border:2px dashed rgba(255,255,255,0.08); background:transparent; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0.5rem; min-height:240px; cursor:pointer; color:var(--g6); font-family:var(--font-b); font-size:0.9rem; transition:background 0.2s,border-color 0.2s; }
+    .add-card:hover { background:rgba(255,255,255,0.02); border-color:rgba(255,255,255,0.18); color:var(--g3); }
+    .add-card .plus { font-size:1.8rem; }
+
+    /* ================================================
+       PORTADAS FAVORITAS
+       ================================================ */
+    #portadas { background:var(--black); }
+    .portadas-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; }
+    .portada-item { position:relative; aspect-ratio:1; overflow:hidden; cursor:pointer; transition:transform 0.4s,opacity 0.4s,filter 0.4s; }
+    .portadas-grid.has-active .portada-item { opacity:0.3; transform:scale(0.92); filter:grayscale(80%); }
+    .portadas-grid.has-active .portada-item.active { opacity:1; transform:scale(1); filter:grayscale(0%); z-index:2; box-shadow:0 20px 60px rgba(0,0,0,0.7); }
+    .portada-item img { width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(50%); transition:transform 0.5s,filter 0.4s; }
+    .portada-item:hover img { filter:grayscale(0%); transform:scale(1.05); }
+    .portadas-grid.has-active .portada-item.active img { transform:scale(1.04); }
+    .portada-item-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,transparent 50%); display:flex; flex-direction:column; justify-content:flex-end; padding:1rem; opacity:0; transition:opacity 0.3s; }
+    .portada-item:hover .portada-item-overlay, .portada-item.active .portada-item-overlay { opacity:1; }
+    .portada-item-name { font-family:var(--font-s); font-size:0.9rem; font-weight:700; color:var(--white); }
+    .portada-item-artist { font-size:0.75rem; color:var(--g3); font-style:italic; }
+    .portada-item-close { position:absolute; top:0.75rem; right:0.75rem; font-family:var(--font-d); font-size:0.6rem; letter-spacing:0.2em; color:var(--white); background:rgba(0,0,0,0.5); padding:0.3rem 0.5rem; opacity:0; transition:opacity 0.3s; }
+    .portada-item.active .portada-item-close { opacity:1; }
+
+    /* ================================================
+       FRAGMENTOS ESPECIALES — 4 por fila, letra iluminada persistente
+       ================================================ */
+    #especiales { background:var(--g9); }
+
+    .specials-grid {
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);   /* 4 columnas fijas */
+      gap:1.5rem;
+    }
+    @media(max-width:1100px) { .specials-grid { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:600px)  { .specials-grid { grid-template-columns:1fr; } }
+
+    .flip-wrapper { perspective:1200px; }
+    .flip-card { position:relative; transform-style:preserve-3d; transition:transform 0.75s cubic-bezier(0.4,0.2,0.2,1); cursor:pointer; }
+    .flip-card.flipped { transform:rotateY(180deg); }
+
+    .flip-front { position:relative; backface-visibility:hidden; display:flex; flex-direction:column; background:var(--g8); border:1px solid rgba(255,255,255,0.06); overflow:hidden; }
+
+    .special-img { width:100%; aspect-ratio:1; position:relative; overflow:hidden; background:var(--g7); flex-shrink:0; }
+    .special-img img { width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(30%); transition:filter 0.4s,transform 0.4s; }
+    .flip-card:hover .special-img img { filter:grayscale(0%); transform:scale(1.03); }
+    .special-img-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:3.5rem; color:var(--g6); }
+    .special-img-overlay { position:absolute; bottom:0; left:0; right:0; height:50px; background:linear-gradient(to top,var(--g8),transparent); }
+
+    /* Zona de letra */
+    .special-lyrics { padding:1.2rem 1.3rem 1.5rem; display:flex; flex-direction:column; gap:0.4rem; position:relative; }
+    .special-quote-mark { font-family:var(--font-s); font-size:3.5rem; line-height:0.5; color:var(--g6); opacity:0.25; position:absolute; top:0.8rem; left:1rem; pointer-events:none; }
+
+    /* Cada línea empieza apagada */
+    .special-lyric-text {
+      font-family:var(--font-s); font-size:0.88rem; font-weight:400; font-style:normal;
+      line-height:1.65; padding-left:0.8rem;
+      /* color inicial oscuro */
+      color:var(--g6);
+      transition:color 0.45s ease;
+    }
+    .special-lyrics .special-lyric-text:first-of-type { padding-top:1.3rem; }
+
+    /* Clase .lit = línea iluminada (togglada por JS, permanece) */
+    .special-lyric-text.lit { color:var(--white); }
+
+    /* Estado progresivo cuando el card está "activo" (hover inicial) */
+    .flip-wrapper:hover .special-lyric-text:not(.lit):nth-of-type(1)  { color:var(--g2); transition-delay:0s; }
+    .flip-wrapper:hover .special-lyric-text:not(.lit):nth-of-type(2)  { color:var(--g2); transition-delay:0.08s; }
+    .flip-wrapper:hover .special-lyric-text:not(.lit):nth-of-type(3)  { color:var(--g2); transition-delay:0.16s; }
+    .flip-wrapper:hover .special-lyric-text:not(.lit):nth-of-type(4)  { color:var(--g2); transition-delay:0.24s; }
+    .flip-wrapper:hover .special-lyric-text:not(.lit):nth-of-type(5)  { color:var(--g2); transition-delay:0.32s; }
+    .flip-wrapper:hover .special-lyric-text:not(.lit):nth-of-type(6)  { color:var(--g2); transition-delay:0.40s; }
+
+    .special-song-info { margin-top:0.7rem; padding-top:0.8rem; border-top:1px solid rgba(255,255,255,0.07); display:flex; flex-direction:column; gap:0.12rem; }
+    .special-song-name { font-family:var(--font-d); font-size:0.82rem; letter-spacing:0.18em; color:var(--g2); }
+    .special-song-artist { font-size:0.75rem; color:var(--g5); font-style:normal; font-family:var(--font-b); }
+    .flip-hint { position:absolute; bottom:0.8rem; right:1rem; font-size:0.58rem; letter-spacing:0.25em; color:var(--g6); font-family:var(--font-d); }
+
+    /* Botón iluminar línea — aparece al hacer clic en la letra (manejado por JS) */
+    /* Al hacer click en una línea se le añade/quita .lit */
+
+    /* REVERSO */
+    .flip-back { position:absolute; inset:0; backface-visibility:hidden; transform:rotateY(180deg); background:var(--g7); border:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem 1.4rem; text-align:center; }
+    .flip-back::before { content:''; position:absolute; inset:5px; border:1px solid rgba(255,255,255,0.05); pointer-events:none; }
+    .flip-back-star { font-size:1rem; color:var(--g4); margin-bottom:0.6rem; letter-spacing:0.3em; }
+    .flip-back-title { font-family:var(--font-d); font-size:0.6rem; letter-spacing:0.45em; color:var(--g4); margin-bottom:1rem; }
+    .flip-back-rule { width:35px; height:1px; background:var(--g5); margin:0 auto 1.1rem; }
+    .flip-back-explanation { font-family:var(--font-b); font-size:0.9rem; font-weight:400; font-style:normal; line-height:1.8; color:var(--g2); text-align:left; }
+    .flip-back-close { position:absolute; bottom:0.8rem; right:1rem; font-size:0.58rem; letter-spacing:0.2em; color:var(--g6); font-family:var(--font-d); }
+
+    /* ================================================
+       INFRAVALORADAS — artistas expandibles
+       ================================================ */
+    #infravaloradas { background:var(--black); }
+
+    .infra-intro {
+      max-width:640px; font-size:1.15rem; font-weight:300; line-height:1.9;
+      color:var(--g4); margin-bottom:3rem;
+    }
+
+    .infra-list {
+      display:flex; flex-direction:column;
+      border-top:1px solid rgba(255,255,255,0.06);
+    }
+
+    .infra-artist {
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      overflow:hidden;
+    }
+
+    /* Cabecera clickeable del artista */
+    .infra-header {
+      display:grid;
+      grid-template-columns:60px 1fr auto;
+      align-items:center;
+      gap:2rem;
+      padding:1.8rem 1rem;
+      cursor:pointer;
+      transition:background 0.2s;
+    }
+    .infra-header:hover { background:rgba(255,255,255,0.03); }
+
+    .infra-num { font-family:var(--font-d); font-size:1.4rem; color:var(--g6); letter-spacing:0.05em; }
+
+    .infra-artist-info { display:flex; flex-direction:column; gap:0.2rem; }
+    .infra-artist-name { font-family:var(--font-s); font-size:1.3rem; font-weight:700; color:var(--white); }
+    .infra-artist-genre { font-size:0.9rem; font-style:italic; color:var(--g5); }
+
+    .infra-toggle {
+      font-family:var(--font-d); font-size:0.65rem; letter-spacing:0.3em;
+      color:var(--g5); transition:color 0.25s;
+      display:flex; align-items:center; gap:0.5rem;
+    }
+    .infra-toggle-arrow {
+      display:inline-block;
+      transition:transform 0.4s ease;
+      font-size:0.8rem;
+    }
+    .infra-artist.open .infra-toggle-arrow { transform:rotate(180deg); }
+    .infra-header:hover .infra-toggle { color:var(--g2); }
+
+    /* Panel de canciones — colapsa/expande */
+    .infra-songs {
+      max-height:0;
+      overflow:hidden;
+      transition:max-height 0.55s cubic-bezier(0.4,0,0.2,1);
+    }
+    .infra-artist.open .infra-songs { max-height:1000px; }
+
+    .infra-songs-inner {
+      padding:0 1rem 2rem 5.5rem;
+      display:flex; flex-direction:column; gap:0;
+    }
+
+    .infra-song-row {
+      display:grid;
+      grid-template-columns:32px 1fr auto;
+      align-items:center; gap:1.2rem;
+      padding:0.9rem 0.5rem;
+      border-bottom:1px solid rgba(255,255,255,0.04);
+      transition:background 0.2s;
+    }
+    .infra-song-row:last-child { border-bottom:none; }
+    .infra-song-row:hover { background:rgba(255,255,255,0.02); }
+
+    .infra-song-num { font-family:var(--font-d); font-size:0.9rem; color:var(--g6); text-align:center; }
+    .infra-song-info { display:flex; flex-direction:column; gap:0.15rem; }
+    .infra-song-name { font-family:var(--font-s); font-size:1rem; font-weight:600; color:var(--g1); }
+    .infra-song-album { font-size:0.82rem; font-style:italic; color:var(--g5); }
+    .infra-song-note { font-size:0.78rem; color:var(--g5); text-align:right; font-family:var(--font-b); font-style:italic; max-width:200px; line-height:1.4; }
+
+    /* ================================================
+       RESEÑAS
+       ================================================ */
+    #resenas { background:var(--g9); padding:8rem 0 7rem; min-height:100vh; }
+    .resenas-header { padding:0 5rem 5rem; max-width:860px; }
+    .resenas-label { font-family:var(--font-d); font-size:0.68rem; letter-spacing:0.5em; color:var(--g5); margin-bottom:1rem; }
+    .resenas-title { font-family:var(--font-s); font-size:clamp(2.8rem,7vw,5.5rem); font-weight:900; line-height:0.95; color:var(--white); margin-bottom:2rem; }
+    .resenas-title em { font-style:italic; color:var(--g4); }
+    .resenas-rule { width:50px; height:1px; background:var(--g6); margin-bottom:2rem; }
+    .resenas-intro { font-family:var(--font-b); font-size:1.2rem; font-weight:300; line-height:1.9; color:var(--g4); max-width:640px; }
+    .resenas-list { display:flex; flex-direction:column; }
+
+    .resena-wrapper { perspective:1600px; }
+    .resena-card { position:relative; transform-style:preserve-3d; transition:transform 0.9s cubic-bezier(0.4,0.2,0.2,1); cursor:pointer; }
+    .resena-card.flipped { transform:rotateY(180deg); }
+    .resena-front { position:relative; backface-visibility:hidden; display:grid; grid-template-columns:min(40%,480px) 1fr; min-height:520px; border-top:1px solid rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.05); background:var(--g9); transition:border-color 0.3s; }
+    .resena-wrapper:hover .resena-front { border-color:rgba(255,255,255,0.15); }
+    .resena-img { position:relative; overflow:hidden; background:var(--g8); }
+    .resena-img img { width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(100%); transition:filter 0.6s,transform 0.6s; }
+    .resena-wrapper:hover .resena-img img { filter:grayscale(50%); transform:scale(1.02); }
+    .resena-img-placeholder { width:100%; height:100%; min-height:520px; display:flex; align-items:center; justify-content:center; font-size:6rem; color:rgba(255,255,255,0.05); }
+    .resena-content { padding:4rem 5rem; display:flex; flex-direction:column; justify-content:center; position:relative; }
+    .resena-number { font-family:var(--font-d); font-size:6rem; line-height:1; color:rgba(255,255,255,0.03); position:absolute; top:2rem; right:3rem; pointer-events:none; user-select:none; }
+    .resena-meta { margin-bottom:2rem; }
+    .resena-song-name { font-family:var(--font-d); font-size:clamp(1.8rem,3.5vw,2.8rem); letter-spacing:0.08em; color:var(--white); line-height:1.05; margin-bottom:0.4rem; }
+    .resena-song-artist { font-family:var(--font-b); font-size:1rem; color:var(--g5); letter-spacing:0.12em; }
+    .resena-sep { width:40px; height:1px; background:rgba(255,255,255,0.12); margin:2rem 0; }
+    .resena-quote-wrap { position:relative; padding-left:1.5rem; border-left:1px solid rgba(255,255,255,0.1); }
+    .resena-lyric { font-family:var(--font-s); font-size:clamp(1.1rem,2vw,1.45rem); font-weight:400; font-style:normal; line-height:1.65; color:var(--g2); display:block; margin-bottom:0.4rem; }
+    .resena-hint { position:absolute; bottom:2rem; right:3rem; font-family:var(--font-d); font-size:0.65rem; letter-spacing:0.3em; color:rgba(255,255,255,0.18); transition:color 0.3s; }
+    .resena-wrapper:hover .resena-hint { color:rgba(255,255,255,0.45); }
+    .resena-back { position:absolute; inset:0; backface-visibility:hidden; transform:rotateY(180deg); background:var(--g8); border-top:1px solid rgba(255,255,255,0.08); border-bottom:1px solid rgba(255,255,255,0.08); display:grid; grid-template-columns:min(40%,480px) 1fr; }
+    .resena-back-side { background:var(--g9); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3rem 2rem; gap:1.5rem; border-right:1px solid rgba(255,255,255,0.05); }
+    .resena-back-side-title { font-family:var(--font-d); font-size:0.65rem; letter-spacing:0.5em; color:var(--g5); writing-mode:vertical-rl; text-orientation:mixed; transform:rotate(180deg); }
+    .resena-back-side-rule { width:1px; height:80px; background:linear-gradient(to bottom,transparent,rgba(255,255,255,0.18),transparent); }
+    .resena-back-side-star { font-size:1rem; color:var(--g5); letter-spacing:0.3em; }
+    .resena-back-content { padding:4rem 5rem; display:flex; flex-direction:column; justify-content:center; overflow-y:auto; position:relative; }
+    .resena-back-label { font-family:var(--font-d); font-size:0.65rem; letter-spacing:0.5em; color:var(--g5); margin-bottom:2rem; }
+    .resena-back-text { font-family:var(--font-b); font-size:1.15rem; font-weight:400; font-style:normal; line-height:1.9; color:var(--g2); }
+    .resena-back-text p + p { margin-top:1.2rem; }
+    .resena-back-close { position:absolute; bottom:2rem; right:3rem; font-family:var(--font-d); font-size:0.65rem; letter-spacing:0.3em; color:rgba(255,255,255,0.2); }
+
+    /* ===== FOOTER ===== */
+    footer { background:var(--g9); padding:2.5rem 5rem; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.05); }
+    .footer-brand { font-family:var(--font-d); font-size:1.1rem; letter-spacing:0.35em; color:var(--g3); }
+    .footer-note { font-size:0.9rem; font-style:italic; color:var(--g6); }
+
+    @media(max-width:900px) {
+      section { padding:7rem 1.5rem 5rem; }
+      #resenas { padding:7rem 0 5rem; }
+      .resenas-header { padding:0 1.5rem 4rem; }
+      .resena-front,.resena-back { grid-template-columns:1fr; }
+      .resena-img { min-height:260px; }
+      .resena-img-placeholder { min-height:260px; }
+      .resena-content { padding:2.5rem 1.5rem; }
+      .resena-back-side { flex-direction:row; writing-mode:horizontal-tb; padding:1.5rem; border-right:none; border-bottom:1px solid rgba(255,255,255,0.05); }
+      .resena-back-side-title { writing-mode:horizontal-tb; transform:none; }
+      .resena-back-side-rule { width:60px; height:1px; }
+      .resena-back-content { padding:2rem 1.5rem; }
+      .resena-number { display:none; }
+      .resena-hint,.resena-back-close { bottom:1rem; right:1.5rem; }
+      footer { padding:2rem 1.5rem; flex-direction:column; gap:1rem; text-align:center; }
+      .infra-songs-inner { padding:0 1rem 2rem 1rem; }
+      .infra-song-note { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">WBE</div>
+  <div class="nav-links" id="navLinks">
+    <a href="#portada">Inicio</a>
+    <a href="#albumes">Álbumes</a>
+    <a href="#portadas">Portadas</a>
+    <a href="#especiales">Fragmentos</a>
+    <a href="#infravaloradas">Infravaloradas</a>
+    <a href="#resenas">Reseñas</a>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Menú"><span></span><span></span><span></span></button>
+</nav>
+
+<script>
+  const toggle = document.getElementById('navToggle');
+  const links  = document.getElementById('navLinks');
+  toggle.addEventListener('click', () => { links.classList.toggle('open'); toggle.classList.toggle('open'); });
+  links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { links.classList.remove('open'); toggle.classList.remove('open'); }));
+</script>
+
+<!-- ====================================================
+     PORTADA
+     ==================================================== -->
+<section id="portada">
+  <div class="portada-orb"></div>
+  <p class="portada-eyebrow">✦ &nbsp; UN ARCHIVO PERSONAL &nbsp; ✦</p>
+  <h1 class="portada-headline">Mi Repertorio</h1>
+  <p class="portada-headline-sub">Personal</p>
+  <div class="portada-rule"></div>
+  <p class="portada-desc">
+    Hubo un tiempo en el que pensé que la vida, sin música, perdería por completo su color. Desde entonces, cada canción que llega a mí deja de ser solo sonido y se transforma en algo mucho más profundo: un recuerdo, una emoción, una parte de mi propia historia.
+    <br><br>Porque al final, algunas canciones no solo se escuchan… también se viven.
+  </p>
+  <p class="portada-quote">"¿Cómo es que la música puede, sin palabras, evocar nuestra risa, nuestros temores, nuestras más grandes aspiraciones?" — Jane Swan</p>
+  <div class="portada-scroll"><span>SCROLL</span><div class="portada-scroll-line"></div></div>
+</section>
+
+<!-- ====================================================
+     ÁLBUMES ESCUCHADOS
+     ==================================================== -->
+<section id="albumes">
+  <p class="section-label">✦ Sección 02</p>
+  <h2 class="section-title">Álbumes <em>Escuchados</em></h2>
+  <div class="deco-line"></div>
+
+  <!-- Leyenda -->
+  <div class="album-legend">
+    <div class="legend-item"><div class="legend-dot fav"></div>Favorito</div>
+    <div class="legend-item"><div class="legend-dot int"></div>Me gusto</div>
+    <div class="legend-item"><div class="legend-dot bad"></div>No me gustó</div>
+    <div class="legend-item"><div class="legend-dot neu"></div>Neutral</div>
+  </div>
+
+  <div class="albums-grid">
+    <!-- class="fav" = favorito | class="int" = interesante | class="bad" = no gustó | sin clase = neutral -->
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Romances.jpg" alt="Romance"></div><div class="album-info"><div class="album-title">Romance</div><div class="album-artist">Luis Miguel</div><div class="album-year">1991</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/JuanG_Palacio.jpg" alt="Juan Gabriel"></div><div class="album-info"><div class="album-title">Juan Gabriel en el Palacio de Bellas Artes</div><div class="album-artist">Juan Gabriel</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Bronco_Amigo.webp" alt="Bronco Amigo"></div><div class="album-info"><div class="album-title">Bronco Amigo</div><div class="album-artist">Bronco</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Joji_nectar.jpg" alt="Nectar"></div><div class="album-info"><div class="album-title">Nectar</div><div class="album-artist">Joji</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Cardenales.jpg" alt="30 Aniversario"></div><div class="album-info"><div class="album-title">30 Aniversario</div><div class="album-artist">Cardenales de Nuevo León</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Yezzus.png" alt="Yeezus"></div><div class="album-info"><div class="album-title">Yeezus</div><div class="album-artist">Kanye West</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Starboy.png" alt="Starboy"></div><div class="album-info"><div class="album-title">Starboy</div><div class="album-artist">The Weeknd</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/2003_-_Lo_que_te_conté_mientras_te_hacías_la_dormida.jpg" alt="La Oreja de Van Gogh"></div><div class="album-info"><div class="album-title">Lo que te conté...</div><div class="album-artist">La Oreja de Van Gogh</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/TCD.jpg" alt="The College Dropout"></div><div class="album-info"><div class="album-title">The College Dropout</div><div class="album-artist">Kanye West</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/X100PRE.jpg" alt="X100PRE"></div><div class="album-info"><div class="album-title">X100PRE</div><div class="album-artist">Bad Bunny</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/LR.jpg" alt="Late Registration"></div><div class="album-info"><div class="album-title">Late Registration</div><div class="album-artist">Kanye West</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/The_Weeknd_-_After_Hours.png" alt="After Hours"></div><div class="album-info"><div class="album-title">After Hours</div><div class="album-artist">The Weeknd</div></div></div>
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/The_Weeknd_-_Beauty_Behind_the_Madness.png" alt="Beauty Behind the Madness"></div><div class="album-info"><div class="album-title">Beauty Behind the Madness</div><div class="album-artist">The Weeknd</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/ASTROWORLD.jpg" alt="ASTROWORLD"></div><div class="album-info"><div class="album-title">ASTROWORLD</div><div class="album-artist">Travis Scott</div><div class="album-year">2018</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Camino del amor.jpg" alt="Camino del amor"></div><div class="album-info"><div class="album-title">Camino del amor</div><div class="album-artist">Temerarios</div><div class="album-year">1992</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Changes.png" alt="Changes"></div><div class="album-info"><div class="album-title">Changes</div><div class="album-artist">Justin Bieber</div><div class="album-year">2020</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/CONTIGENTE.avif" alt="CONTIGENTE"></div><div class="album-info"><div class="album-title">CONTIGENTE</div><div class="album-artist">Natanael Cano</div><div class="album-year">2024</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Daltonico.jpg" alt="Daltónico"></div><div class="album-info"><div class="album-title">Daltónico</div><div class="album-artist">Enjambre</div><div class="album-year">2010</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/DINASTIA.jpg" alt="DINASTIA"></div><div class="album-info"><div class="album-title">DINASTIA</div><div class="album-artist">Humbe</div><div class="album-year">2023</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/EXODO.jpg" alt="ÉXODO"></div><div class="album-info"><div class="album-title">ÉXODO</div><div class="album-artist">Peso Pluma</div><div class="album-year">2024</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/GENESIS.jpg" alt="GÉNESIS"></div><div class="album-info"><div class="album-title">GÉNESIS</div><div class="album-artist">Peso Pluma</div><div class="album-year">2023</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/J_DP.avif" alt="J_DP"></div><div class="album-info"><div class="album-title">J_DP</div><div class="album-artist">Junior H</div><div class="album-year">2023</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/JACKBOYS.jpg" alt="JACKBOYS"></div><div class="album-info"><div class="album-title">JACKBOYS</div><div class="album-artist">JackBoys & Travis Scott</div><div class="album-year">2019</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/MadV.jpg" alt="Madvillainy"></div><div class="album-info"><div class="album-title">Madvillainy</div><div class="album-artist">MF DOOM & Madlib</div><div class="album-year">2004</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Mi Vida eres tu.jpg" alt="Mi vida eres tú"></div><div class="album-info"><div class="album-title">Mi vida eres tú</div><div class="album-artist">Los Temerarios</div><div class="album-year">1993</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/MUSICA.jpg" alt="MÚSICA"></div><div class="album-info"><div class="album-title">MÚSICA</div><div class="album-artist">Playboi Carti</div><div class="album-year">2024</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/MVEC2.avif" alt="MVEC2"></div><div class="album-info"><div class="album-title">MVEC2</div><div class="album-artist">Kevin Kaarl</div><div class="album-year">2023</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Nata_Montana.jpg" alt="Nata Montana"></div><div class="album-info"><div class="album-title">Nata Montana</div><div class="album-artist">Natanael Cano</div><div class="album-year">2023</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Por el mundo.jpg" alt="Por el mundo"></div><div class="album-info"><div class="album-title">Por el mundo</div><div class="album-artist">Bronco</div><div class="album-year">1991</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Por Retenerte.jpg" alt="Por Retenerte"></div><div class="album-info"><div class="album-title">Por Retenerte</div><div class="album-artist">Bronco</div><div class="album-year">1992</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Random_Access.jpg" alt="Random Access Memories"></div><div class="album-info"><div class="album-title">Random Access Memories</div><div class="album-artist">Daft Punk</div><div class="album-year">2013</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/SB4L.jpg" alt="Sad Boyz 4 Life"></div><div class="album-info"><div class="album-title">Sad Boyz 4 Life</div><div class="album-artist">Junior H</div><div class="album-year">2021</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/SB4L3.avif" alt="Sad Boyz 4 Life II"></div><div class="album-info"><div class="album-title">Sad Boyz 4 Life II</div><div class="album-artist">Junior H</div><div class="album-year">2023</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/SEGUNDO_ROMANCE.webp" alt="Segundo Romance"></div><div class="album-info"><div class="album-title">Segundo Romance</div><div class="album-artist">Luis Miguel</div><div class="album-year">1994</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Super Bronco.jpg" alt="Super Bronco"></div><div class="album-info"><div class="album-title">Super Bronco</div><div class="album-artist">Bronco</div><div class="album-year">1989</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/Tu ultima cancion.jpg" alt="Tu última canción"></div><div class="album-info"><div class="album-title">Tu última canción</div><div class="album-artist">Los Temerarios</div><div class="album-year">1990</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/UTOPIA.jpg" alt="UTOPIA"></div><div class="album-info"><div class="album-title">UTOPIA</div><div class="album-artist">Travis Scott</div><div class="album-year">2023</div></div></div>
+
+    <div class="album-card neu"><div class="album-cover"><img src="Albums/TOP_B.jpg" alt="TOP_B"></div><div class="album-info"><div class="album-title">TOP_B</div><div class="album-artist">Bizarrap</div><div class="album-year">2021</div></div></div>
+    <!-- Copia un .album-card y añade fav / int / bad según corresponda -->
+    <div class="album-card add-card" onclick="alert('Copia un bloque .album-card para agregar otro álbum')"><span class="plus">+</span><span>Agregar álbum</span></div>
+  </div>
+</section>
+
+<!-- ====================================================
+     PORTADAS FAVORITAS
+     ==================================================== -->
+<section id="portadas">
+  <p class="section-label">✦ Sección 03</p>
+  <h2 class="section-title">Portadas <em>Favoritas</em></h2>
+  <div class="deco-line"></div>
+  <div class="portadas-grid" id="portadasGrid">
+    <div class="portada-item" onclick="togglePortada(this)"><img src="Albums/Romances.jpg" alt="Romance"><div class="portada-item-overlay"><div class="portada-item-name">Romance</div><div class="portada-item-artist">Luis Miguel</div></div><div class="portada-item-close">✕ cerrar</div></div>
+    <div class="portada-item" onclick="togglePortada(this)"><img src="Albums/TCD.jpg" alt="The College Dropout"><div class="portada-item-overlay"><div class="portada-item-name">The College Dropout</div><div class="portada-item-artist">Kanye West</div></div><div class="portada-item-close">✕ cerrar</div></div>
+    <div class="portada-item" onclick="togglePortada(this)"><img src="Albums/The_Weeknd_-_After_Hours.png" alt="After Hours"><div class="portada-item-overlay"><div class="portada-item-name">After Hours</div><div class="portada-item-artist">The Weeknd</div></div><div class="portada-item-close">✕ cerrar</div></div>
+    <div class="portada-item" onclick="togglePortada(this)"><img src="Albums/Joji_nectar.jpg" alt="Nectar"><div class="portada-item-overlay"><div class="portada-item-name">Nectar</div><div class="portada-item-artist">Joji</div></div><div class="portada-item-close">✕ cerrar</div></div>
+    <div class="portada-item" onclick="togglePortada(this)"><img src="Albums/Starboy.png" alt="Starboy"><div class="portada-item-overlay"><div class="portada-item-name">Starboy</div><div class="portada-item-artist">The Weeknd</div></div><div class="portada-item-close">✕ cerrar</div></div>
+    <div class="portada-item" onclick="togglePortada(this)"><img src="Albums/X100PRE.jpg" alt="X100PRE"><div class="portada-item-overlay"><div class="portada-item-name">X100PRE</div><div class="portada-item-artist">Bad Bunny</div></div><div class="portada-item-close">✕ cerrar</div></div>
+    <div class="portada-item" onclick="togglePortada(this)"><img src="Albums/Yezzus.png" alt="Yeezus"><div class="portada-item-overlay"><div class="portada-item-name">Yeezus</div><div class="portada-item-artist">Kanye West</div></div><div class="portada-item-close">✕ cerrar</div></div>
+    <div class="portada-item" onclick="togglePortada(this)"><img src="Albums/LR.jpg" alt="Late Registration"><div class="portada-item-overlay"><div class="portada-item-name">Late Registration</div><div class="portada-item-artist">Kanye West</div></div><div class="portada-item-close">✕ cerrar</div></div>
+  </div>
+</section>
+
+<script>
+  function togglePortada(el) {
+    const grid = document.getElementById('portadasGrid');
+    const isActive = el.classList.contains('active');
+    grid.querySelectorAll('.portada-item').forEach(i => i.classList.remove('active'));
+    grid.classList.remove('has-active');
+    if (!isActive) { el.classList.add('active'); grid.classList.add('has-active'); }
+  }
+</script>
+
+<!-- ====================================================
+     FRAGMENTOS ESPECIALES — 4 por fila, letra iluminada
+     ==================================================== -->
+<section id="especiales">
+  <p class="section-label">✦ Sección 04</p>
+  <h2 class="section-title">Fragmentos <em>Especiales</em></h2>
+  <div class="deco-line"></div>
+  <p style="font-size:0.8rem;color:var(--g5);font-family:var(--font-d);letter-spacing:0.2em;margin-bottom:2rem;">
+    TOCA UNA LÍNEA PARA ILUMINARLA — GIRA LA TARJETA PARA LEER MÁS
+  </p>
+
+  <div class="specials-grid">
+
+    <!-- ── Macro para un bloque (se repite) ──
+         onclick en .flip-card: gira
+         onclick en .special-lyric-text: ilumina esa línea (JS abajo)
+    -->
+
+    <div class="flip-wrapper">
+      <div class="flip-card" id="fc1">
+        <div class="flip-front">
+          <div class="special-img"><img src="Canciones_E/Elemento.jpg" alt="Elemento"><div class="special-img-overlay"></div></div>
+          <div class="special-lyrics">
+            <span class="special-quote-mark">"</span>
+            <p class="special-lyric-text">Yo me alejo pero no te dejo de pensar...</p>
+            <p class="special-lyric-text">Te imagino levantándote por la mañana sin mí,</p>
+            <p class="special-lyric-text">pensando "¿valdrá la pena seguir?"</p>
+            <p class="special-lyric-text">Mi elemento vital.</p>
+            <div class="special-song-info"><div class="special-song-name">ELEMENTO</div><div class="special-song-artist">Enjambre</div></div>
+          </div>
+          <div class="flip-hint">Girar ↻</div>
+        </div>
+        <div class="flip-back"><div class="flip-back-star">✦</div><div class="flip-back-title">Por qué es especial</div><div class="flip-back-rule"></div><p class="flip-back-explanation">Enjambre hizo que “Elemento” se sintiera para mí mucho más que una simple canción. Hay algo en ella que no termina cuando la música acaba; al contrario, se queda conmigo durante horas, como un pensamiento al que inevitablemente vuelvo. Cada vez que la escucho siento una melancolía muy suave, casi silenciosa, que mezcla amor, nostalgia y admiración de una manera difícil de explicar, pero muy fácil de sentir. <br>
+
+        Lo que más me atrapa de la canción es que no intenta hablar del amor de una forma exagerada o dramática. Para mí, transmite esa clase de cariño profundo que nace cuando alguien deja de ser solamente una persona importante y empieza a convertirse en parte de tu mundo interior. Y quizá por eso me llega tanto: porque hay emociones que no se viven con intensidad escandalosa, sino con una tristeza tranquila que permanece incluso en los momentos más silenciosos. <br>
+
+        También siento que “Elemento” tiene algo muy humano en su forma de existir. La instrumentación, la voz y la manera en la que está escrita hacen que todo se sienta íntimo, como si estuviera hecha para escucharse en soledad, cuando uno tiene demasiados pensamientos encima. No es una canción que simplemente escucho y olvido; es una de esas canciones que terminan habitando dentro de mí, como un recuerdo al que siempre encuentro la manera de regresar.</p><div class="flip-back-close">↺ Girar</div></div>
+      </div>
+    </div>
+
+    <div class="flip-wrapper">
+      <div class="flip-card" id="fc2">
+        <div class="flip-front">
+          <div class="special-img"><img src="Canciones_E/Barca.jpg" alt="La Barca"><div class="special-img-overlay"></div></div>
+          <div class="special-lyrics">
+            <span class="special-quote-mark">"</span>
+            <p class="special-lyric-text">Cuando la luz del Sol se esté apagando</p>
+            <p class="special-lyric-text">Y te sientas cansada de vagar</p>
+            <p class="special-lyric-text">Piensa que yo, por ti, estaré esperando</p>
+            <p class="special-lyric-text">Hasta que tú decidas regresar.</p>
+            <div class="special-song-info"><div class="special-song-name">LA BARCA</div><div class="special-song-artist">Luis Miguel</div></div>
+          </div>
+          <div class="flip-hint">Girar ↻</div>
+        </div>
+        <div class="flip-back"><div class="flip-back-star">✦</div><div class="flip-back-title">Por qué es especial</div><div class="flip-back-rule"></div><p class="flip-back-explanation">Para mí, pocas canciones logran transmitir tan bien esa resignación silenciosa que aparece cuando entiendes que la otra persona ya tomó una decisión y no queda nada por hacer más que aceptarla. Hay algo profundamente humano en la manera en que se expone el sentimiento: sin orgullo, sin enojo, solo con la honestidad de quien todavía ama incluso sabiendo que probablemente ya no será correspondido.
+
+        Lo que más me golpea es esa debilidad tan sincera de admitir que, aunque intentemos seguir adelante, una parte de nosotros seguirá esperando. Esperando un mensaje, un regreso, o simplemente la posibilidad imposible de volver a sentir lo que alguna vez existió. Y quizá por eso duele tanto, porque no habla de un amor idealizado, sino de esa dificultad real de soltar a alguien que todavía habita dentro de nosotros.</p><div class="flip-back-close">↺ Girar</div></div>
+      </div>
+    </div>
+
+    <div class="flip-wrapper">
+      <div class="flip-card" id="fc3">
+        <div class="flip-front">
+          <div class="special-img"><img src="Canciones_E/Monitor.jpg" alt="Monitor"><div class="special-img-overlay"></div></div>
+          <div class="special-lyrics">
+            <span class="special-quote-mark">"</span>
+            <p class="special-lyric-text">Y los dos llegamos tarde para decirnos que</p>
+            <p class="special-lyric-text">Y me lamento por no estar allá</p>
+            <p class="special-lyric-text">... la distancia le ganó al amor.</p>
+            <div class="special-song-info"><div class="special-song-name">MONITOR</div><div class="special-song-artist">Volovan</div></div>
+          </div>
+          <div class="flip-hint">Girar ↻</div>
+        </div>
+        <div class="flip-back"><div class="flip-back-star">✦</div><div class="flip-back-title">Por qué es especial</div><div class="flip-back-rule"></div><p class="flip-back-explanation">La canción captura perfectamente esa extraña paradoja de tener a alguien tan presente en la mente, pero saber que en la realidad es invisible e intocable. El monitor deja de ser un aparato para volverse el único puente posible; un cristal que, aunque es frío, es capaz de transmitir emociones y mantenernos conectados con quienes más nos importan pero no pueden estar cerca.
+
+        Al final, la canción es el retrato de esa espera silenciosa frente a la luz de la pantalla. Es admitir que nos quedamos ahí, detenidos, buscando una respuesta o una señal que acorte los kilómetros. "Monitor" es eso: la vulnerabilidad de estar frente a una imagen sabiendo que, aunque el sentimiento es gigante, la distancia física es una frontera que solo la tecnología nos permite, a duras penas, cruzar.</p><div class="flip-back-close">↺ Girar</div></div>
+      </div>
+    </div>
+
+    <div class="flip-wrapper">
+      <div class="flip-card" id="fc4">
+        <div class="flip-front">
+          <div class="special-img"><img src="Canciones_E/Lover is a Day.jpeg" alt="Lover is a Day"><div class="special-img-overlay"></div></div>
+          <div class="special-lyrics">
+            <span class="special-quote-mark">"</span>
+            <p class="special-lyric-text">El tiempo cambió</p>
+            <p class="special-lyric-text">Somos diferentes</p>
+            <p class="special-lyric-text">¿Amarás esta parte de mí?</p>
+            <div class="special-song-info"><div class="special-song-name">LOVER IS A DAY</div><div class="special-song-artist">Cuco</div></div>
+          </div>
+          <div class="flip-hint">Girar ↻</div>
+        </div>
+        <div class="flip-back"><div class="flip-back-star">✦</div><div class="flip-back-title">Por qué es especial</div><div class="flip-back-rule"></div><p class="flip-back-explanation">Aunque no busque la perfección técnica o lírica, logra transmitir algo mucho más real: cómo el amor nos muestra vulnerables, pero al mismo tiempo convierte a la otra persona en nuestro refugio contra esos mismos miedos. Es esa dualidad de sentir que la mente es un caos, pero encontrar la calma en una mirada.
+
+        Escucharla hoy es abrazar al Joshua de 15 años que la amó por primera vez; es un recordatorio de que, aunque el tiempo pase, hay canciones que se quedan grabadas como hitos de nuestra propia historia. Me gusta porque me evoca cosas bonitas y me demuestra que, al final, crecer también es aprender a mirar hacia atrás y reconocer esos momentos donde el amor fue nuestra única medicina.</p><div class="flip-back-close">↺ Girar</div></div>
+      </div>
+    </div>
+
+    <div class="flip-wrapper">
+      <div class="flip-card" id="fc5">
+        <div class="flip-front">
+          <div class="special-img"><img src="Canciones_E/Me_Encantaria.jpg" alt="Me Encantaría"><div class="special-img-overlay"></div></div>
+          <div class="special-lyrics">
+            <span class="special-quote-mark">"</span>
+            <p class="special-lyric-text">Me encantaría beber de tus sueños</p>
+            <p class="special-lyric-text">Y despertar tan cerca de tu tibio aliento</p>
+            <p class="special-lyric-text">Me encantaría regarte la flor de tu desierto</p>
+            <div class="special-song-info"><div class="special-song-name">ME ENCANTARÍA</div><div class="special-song-artist">Pequeños Musical</div></div>
+          </div>
+          <div class="flip-hint">Girar ↻</div>
+        </div>
+        <div class="flip-back"><div class="flip-back-star">✦</div><div class="flip-back-title">Por qué es especial</div><div class="flip-back-rule"></div><p class="flip-back-explanation">Esta canción retrata de manera perfecta la dualidad de desear algo y, al mismo tiempo, saber que es imposible. No nace desde la desesperación o la urgencia de recuperar a alguien, sino desde una resignación serena que acepta que el pasado ya no se puede cambiar. <br> <br>Es el placer de imaginar lo que "pudo ser" simplemente porque ese pensamiento se siente bien; es poner sobre la mesa todos los motivos por los que las cosas habrían funcionado, permitiéndonos ser escuchados, aunque sea solo por nuestra propia imaginación. <br> <br>
+
+        Más que una dedicatoria a otra persona, la interpreto como una conversación íntima con uno mismo. Es el momento en que admitimos que, a pesar de la distancia y el tiempo, no cambiaríamos a esa persona por nada, pero que hemos aceptado vivir ese amor solo en nuestro mundo interno. Por eso es de las mejores canciones que existen: porque nos permite expresar esos anhelos a "pecho abierto" sin la ingenuidad de la adolescencia, sino con la madurez de quien entiende que el deseo y la realidad a veces corren por caminos diferentes.</p><div class="flip-back-close">↺ Girar</div></div>
+      </div>
+    </div>
+
+    <div class="flip-wrapper">
+      <div class="flip-card" id="fc6">
+        <div class="flip-front">
+          <div class="special-img"><img src="Canciones_E/Ganas de Ti.jpg" alt="Ganas de Ti"><div class="special-img-overlay"></div></div>
+          <div class="special-lyrics">
+            <span class="special-quote-mark">"</span>
+            <p class="special-lyric-text">Ahí no había mitades</p>
+            <p class="special-lyric-text">Y nada nos sobraba</p>
+            <p class="special-lyric-text">Al despertar vi que era un sueño,</p>
+            <p class="special-lyric-text">y hoy tengo ganas de ti</p>
+            <div class="special-song-info"><div class="special-song-name">GANAS DE TI</div><div class="special-song-artist">Pequeños Musical</div></div>
+          </div>
+          <div class="flip-hint">Girar ↻</div>
+        </div>
+        <div class="flip-back"><div class="flip-back-star">✦</div><div class="flip-back-title">Por qué es especial</div><div class="flip-back-rule"></div><p class="flip-back-explanation">Esta canción describe con exactitud lo que significa despertar de un sueño solo para hundirse en el recuerdo de una realidad que fue igual de onírica. Sugiere que la conexión con esa persona alcanzó un nivel de perfección tan alto —donde no hacían falta complementos y nada sobraba— que cualquier momento presente se siente incompleto. Es esa precisión en el encaje de dos cuerpos y dos almas lo que sumerge al oyente en una melancolía profunda, al comprender que hubo un tiempo en que la vida fue plena y hoy ese espacio parece imposible de llenar.
+             <br> <br>
+        Al final, la letra retrata ese duelo sensorial donde la ausencia se vuelve tangible. Al despertar y enfrentarse a la carencia de esa armonía absoluta, resurgen con una fuerza inevitable las ganas de tener a esa persona de vuelta, aunque solo sea por un instante. Es el grito de quien ya conoció la perfección y ahora debe aprender a vivir con el eco de lo que, por un tiempo, lo fue todo.</p><div class="flip-back-close">↺ Girar</div></div>
+      </div>
+    </div>
+
+    <div class="flip-wrapper">
+      <div class="flip-card" id="fc7">
+        <div class="flip-front">
+          <div class="special-img"><img src="Canciones_E/Gotas de fuego.jpg" alt="Gotas de Fuego"><div class="special-img-overlay"></div></div>
+          <div class="special-lyrics">
+            <span class="special-quote-mark">"</span>
+            <p class="special-lyric-text">Vuelve a mí, quisiste terminar y admito tu razón</p>
+            <p class="special-lyric-text">Pensaste que, quizá, sería lo mejor</p>
+            <p class="special-lyric-text">Marcharte y olvidar los besos y el amor</p>
+            <div class="special-song-info"><div class="special-song-name">GOTAS DE FUEGO</div><div class="special-song-artist">José José</div></div>
+          </div>
+          <div class="flip-hint">Girar ↻</div>
+        </div>
+        <div class="flip-back"><div class="flip-back-star">✦</div><div class="flip-back-title">Por qué es especial</div><div class="flip-back-rule"></div><p class="flip-back-explanation">Cuando hablamos de desamor, es imposible no pensar en José José y en joyas como esta. Desde la melodía, la canción te transfiere una necesidad abrumadora de estar con el otro, un desespero tan grande que parece que nada más en el mundo importara. Es la banda sonora de una rendición absoluta, donde la música prepara el terreno para un sentimiento que roza la locura.
+
+        La letra es, sin duda, la cereza del pastel; cada verso se siente desgarrador, retratando a alguien que se vuelve preso voluntario de lo que sea que esa persona decida entregarle. Es esa sensación de estar a merced del otro, viviendo un incendio interno que quema pero del que no quieres escapar. Al final, "Gotas de fuego" es el retrato de un amor que duele precisamente porque se siente con una intensidad que pocos se atreven a confesar.</p><div class="flip-back-close">↺ Girar</div></div>
+      </div>
+    </div>
+
+    <div class="flip-wrapper">
+      <div class="flip-card" id="fc8">
+        <div class="flip-front">
+          <div class="special-img"><img src="Canciones_E/Awake.jpg" alt="Awake"><div class="special-img-overlay"></div></div>
+          <div class="special-lyrics">
+            <span class="special-quote-mark">"</span>
+            <p class="special-lyric-text">We've got a feeling of the day</p>
+            <p class="special-lyric-text">Last time wasn't what we made</p>
+            <p class="special-lyric-text">Love is our only true escape</p>
+            <div class="special-song-info"><div class="special-song-name">AWAKE</div><div class="special-song-artist">Electric Guest</div></div>
+          </div>
+          <div class="flip-hint">Girar ↻</div>
+        </div>
+        <div class="flip-back"><div class="flip-back-star">✦</div><div class="flip-back-title">Por qué es especial</div><div class="flip-back-rule"></div><p class="flip-back-explanation">Fue de las primeras canciones que realmente se quedaron conmigo, incluso antes de que entendiera por qué. La escuchaba cuando tenía como 14 años, en esa época donde pasaba horas jugando Forza Horizon en el Xbox, manejando sin rumbo mientras la canción sonaba de fondo. Y aunque en ese entonces ni siquiera entendía inglés, había algo en el ritmo y en la atmósfera que me daba una tranquilidad difícil de explicar.
+            <br>
+        Creo que parte de lo especial que se volvió para mí tiene que ver con los recuerdos que terminó construyendo alrededor suyo. La canción dejó de ser solo música y se convirtió en el sonido de una etapa muy específica de mi vida: tardes enteras manejando virtualmente sin preocuparme por nada, simplemente disfrutando el momento. Hay una nostalgia muy bonita en recordar eso, porque era una época mucho más simple.
+            <br>
+        Lo curioso es que nunca entendí realmente la letra en aquel tiempo. Solo asumía que hablaba de amor y me dejaba llevar por cómo sonaba. Ni siquiera conocía Spotify o buscaba canciones por mi cuenta; literalmente entraba al juego también por la música. Y quizá eso hace que hoy la recuerde con tanto cariño: porque no la descubrí buscándola, sino que llegó sola y terminó acompañando una parte muy tranquila de mi vida.
+          <br>
+        Mucho tiempo después la volví a escuchar en un video y por fin supe cómo se llamaba. Y honestamente, encontrarla otra vez se sintió como reencontrarme con una parte de mí que llevaba años olvidada.</p><div class="flip-back-close">↺ Girar</div></div>
+      </div>
+    </div>
+
+    <div class="flip-wrapper">
+      <div class="flip-card" id="fc9">
+        <div class="flip-front">
+          <div class="special-img"><img src="Canciones_E/Todo Cuenta.jpg" alt="Todo Cuenta"><div class="special-img-overlay"></div></div>
+          <div class="special-lyrics">
+            <span class="special-quote-mark">"</span>
+            <p class="special-lyric-text">Hoy, hoy no quiero ver el sol</p>
+            <p class="special-lyric-text">Y me quedo en medio de la oscura habitación</p>
+            <p class="special-lyric-text">Porque sé que no vas a regresar</p>
+            <div class="special-song-info"><div class="special-song-name">TODO CUENTA</div><div class="special-song-artist">DLD</div></div>
+          </div>
+          <div class="flip-hint">Girar ↻</div>
+        </div>
+        <div class="flip-back"><div class="flip-back-star">✦</div><div class="flip-back-title">Por qué es especial</div><div class="flip-back-rule"></div><p class="flip-back-explanation">Esta canción describe de una manera muy poderosa lo que significa salir de un periodo oscuro después de una pérdida. No se queda atrapada en el dolor ni convierte la tristeza en el centro absoluto de todo; más bien, transmite esa sensación de haber sobrevivido emocionalmente a algo que en algún momento parecía imposible de superar. Y creo que eso es lo que la vuelve tan especial.
+
+        Muchas canciones sobre pérdidas hablan desde la derrota, desde el vacío o desde la imposibilidad de seguir adelante. Pero aquí ocurre algo distinto: el dolor sigue presente, pero ya no domina por completo. Hay una especie de renacimiento emocional en la manera en que está construida, como si poco a poco la persona volviera a encontrar razones para seguir existiendo fuera de aquello que perdió.
+
+        También me gusta porque no presenta la superación como algo perfecto o inmediato. Se siente más humana que eso. Da la impresión de que la luz aparece lentamente, después de mucho tiempo viviendo entre recuerdos, dudas y heridas abiertas. Y justamente por eso resulta tan inspiradora: porque no habla de olvidar el sufrimiento, sino de aprender a vivir después de él sin dejar que destruya todo lo que uno es.
+
+        Para mí, el verdadero corazón de la canción está en esa transición entre la sombra y la luz. En mostrar que incluso después de los momentos más difíciles todavía existe la posibilidad de reconstruirse, de volver a sentirse vivo y de entender que sanar no significa borrar el pasado, sino encontrar la fuerza para seguir avanzando a pesar de él.</p><div class="flip-back-close">↺ Girar</div></div>
+      </div>
+    </div>
+
+    <div class="flip-wrapper">
+      <div class="flip-card" id="fc10">
+        <div class="flip-front">
+          <div class="special-img"><img src="Canciones_E/Te lo pido por favor.jpg" alt="Te lo pido por favor"><div class="special-img-overlay"></div></div>
+          <div class="special-lyrics">
+            <span class="special-quote-mark">"</span>
+            <p class="special-lyric-text">Donde esté, hoy y siempre</p>
+            <p class="special-lyric-text">Yo te quiero conmigo</p>
+            <p class="special-lyric-text">No me dejes ir solo</p>
+            <p class="special-lyric-text">Pero no me dejes nunca, nunca.</p>
+            <div class="special-song-info"><div class="special-song-name">TE LO PIDO POR FAVOR</div><div class="special-song-artist">Jaguares</div></div>
+          </div>
+          <div class="flip-hint">Girar ↻</div>
+        </div>
+        <div class="flip-back"><div class="flip-back-star">✦</div><div class="flip-back-title">Por qué es especial</div><div class="flip-back-rule"></div><p class="flip-back-explanation">Jaguares logra convertir “Te Lo Pido Por Favor” en una de las expresiones más honestas y vulnerables del amor. La canción no habla de un amor arrogante ni posesivo; habla de alguien que reconoce abiertamente cuánto necesita a la otra persona en su vida. Desde el inicio, la letra transmite esa sensación de refugio emocional, como si la persona amada fuera quien da dirección, calma y sentido en medio del caos. <br>
+
+        Lo que más me conmueve es la humildad con la que está escrita. Frases como “¿Cómo te puedo pagar todo lo que haces por mí?” hacen que el amor se sienta menos como una conquista y más como un agradecimiento profundo. La canción retrata a alguien que se siente genuinamente afortunado de haber encontrado a esa persona, alguien que reconoce todo el bienestar y felicidad que ha recibido gracias a ella.
+      <br>
+        Y justamente ahí es donde el “te lo pido por favor” adquiere tanta fuerza. No nace desde el orgullo ni desde la exigencia de quien cree merecer algo, sino desde el miedo sincero de perder aquello que más ama. Es la confesión de alguien que entiende que hay personas cuya presencia transforma completamente nuestra vida, al punto de que imaginarse sin ellas resulta devastador.
+
+        <br> <br>
+        Porque cuando realmente amas a alguien, inevitablemente aparece el temor de que un día ya no esté. Y en lugar de ocultar ese miedo, la canción lo expone por completo. No intenta parecer fuerte; al contrario, abraza la vulnerabilidad de necesitar a alguien y decirlo sin reservas.</p><div class="flip-back-close">↺ Girar</div></div>
+      </div>
+    </div>
+
+    <!-- Copia un .flip-wrapper para agregar más. Siempre quedan en grupos de 4 por fila. -->
+
+  </div>
+</section>
+
+<!-- JS: girar tarjetas + iluminar líneas de letra (persiste) -->
+<script>
+  // Girar al hacer clic en la tarjeta (pero no en las líneas de letra)
+  document.querySelectorAll('.flip-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+      // Si el clic fue en una línea de letra, no girar
+      if (e.target.classList.contains('special-lyric-text')) return;
+      this.classList.toggle('flipped');
+    });
+  });
+
+  // Iluminar línea al hacer clic en ella (persistente, toggle)
+  document.querySelectorAll('.special-lyric-text').forEach(line => {
+    line.addEventListener('click', function(e) {
+      e.stopPropagation(); // no propagar al flip-card
+      this.classList.toggle('lit');
+    });
+    // Cursor de pointer para indicar que es clickeable
+    line.style.cursor = 'pointer';
+  });
+</script>
+
+<!-- ====================================================
+     INFRAVALORADAS
+     ==================================================== -->
+<section id="infravaloradas">
+  <p class="section-label">✦ Sección 05</p>
+  <h2 class="section-title">Canciones <em>Infravaloradas</em></h2>
+  <div class="deco-line"></div>
+  <p class="infra-intro">
+    Canciones que merecen mucho más de lo que reciben. Las que se pierden entre los éxitos, las que viven en la cara B, las que casi nadie menciona pero que, para mí, definen igual o mejor a su artista.
+  </p>
+
+  <div class="infra-list">
+
+    <!-- ── ARTISTA 1 ── -->
+    <div class="infra-artist" id="ia1">
+      <div class="infra-header" onclick="toggleInfra('ia1')">
+        <div class="infra-num">01</div>
+        <div class="infra-artist-info">
+          <div class="infra-artist-name">La Arrolladora Banda El Limón De René Camacho</div>
+          <div class="infra-artist-genre"></div>
+        </div>
+        <div class="infra-toggle">Ver canciones <span class="infra-toggle-arrow">↓</span></div>
+      </div>
+      <div class="infra-songs">
+        <div class="infra-songs-inner">
+          <div class="infra-song-row">
+            <div class="infra-song-num">1</div>
+            <div class="infra-song-info"><div class="infra-song-name">Carita de perdón.</div></div>
+            <div class="infra-song-note"></div>
+          </div>
+          <div class="infra-song-row">
+            <div class="infra-song-num">2</div>
+            <div class="infra-song-info"><div class="infra-song-name">Valio la pena equivocarme.</div></div>
+            <div class="infra-song-note"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ARTISTA 2 ── -->
+    <div class="infra-artist" id="ia2">
+      <div class="infra-header" onclick="toggleInfra('ia2')">
+        <div class="infra-num">02</div>
+        <div class="infra-artist-info">
+          <div class="infra-artist-name">Luis Miguel</div>
+          <div class="infra-artist-genre"></div>
+        </div>
+        <div class="infra-toggle">Ver canciones <span class="infra-toggle-arrow">↓</span></div>
+      </div>
+      <div class="infra-songs">
+        <div class="infra-songs-inner">
+          <div class="infra-song-row">
+            <div class="infra-song-num">1</div>
+            <div class="infra-song-info"><div class="infra-song-name">Cómo</div><div class="infra-song-album"></div></div>
+            <div class="infra-song-note"></div>
+          </div>
+          <div class="infra-song-row">
+            <div class="infra-song-num">2</div>
+            <div class="infra-song-info"><div class="infra-song-name">Sintiéndote Lejos</div><div class="infra-song-album"></div></div>
+            <div class="infra-song-note"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ARTISTA 3 ── -->
+    <div class="infra-artist" id="ia3">
+      <div class="infra-header" onclick="toggleInfra('ia3')">
+        <div class="infra-num">03</div>
+        <div class="infra-artist-info">
+          <div class="infra-artist-name">Kanye West</div>
+          <div class="infra-artist-genre">Hip-Hop / Rap / Experimental</div>
+        </div>
+        <div class="infra-toggle">Ver canciones <span class="infra-toggle-arrow">↓</span></div>
+      </div>
+      <div class="infra-songs">
+        <div class="infra-songs-inner">
+          <div class="infra-song-row">
+            <div class="infra-song-num">1</div>
+            <div class="infra-song-info"><div class="infra-song-name">Last Call</div><div class="infra-song-album"></div></div>
+            <div class="infra-song-note"></div>
+          </div>
+          <div class="infra-song-row">
+            <div class="infra-song-num">2</div>
+            <div class="infra-song-info"><div class="infra-song-name">Roses</div><div class="infra-song-album"></div></div>
+            <div class="infra-song-note"></div>
+          </div>
+          <div class="infra-song-row">
+            <div class="infra-song-num">3</div>
+            <div class="infra-song-info"><div class="infra-song-name">Late</div><div class="infra-song-album"></div></div>
+            <div class="infra-song-note"></div>
+          </div>
+          <div class="infra-song-row">
+            <div class="infra-song-num">4</div>
+            <div class="infra-song-info"><div class="infra-song-name">New Again</div><div class="infra-song-album"></div></div>
+            <div class="infra-song-note"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ARTISTA 4 ── -->
+    <div class="infra-artist" id="ia4">
+      <div class="infra-header" onclick="toggleInfra('ia4')">
+        <div class="infra-num">04</div>
+        <div class="infra-artist-info">
+          <div class="infra-artist-name"></div>
+          <div class="infra-artist-genre"></div>
+        </div>
+        <div class="infra-toggle">Ver canciones <span class="infra-toggle-arrow">↓</span></div>
+      </div>
+      <div class="infra-songs">
+        <div class="infra-songs-inner">
+          <div class="infra-song-row">
+            <div class="infra-song-num">1</div>
+            <div class="infra-song-info"><div class="infra-song-name"></div><div class="infra-song-album"></div></div>
+            <div class="infra-song-note"></div>
+          </div>
+          <div class="infra-song-row">
+            <div class="infra-song-num">2</div>
+            <div class="infra-song-info"><div class="infra-song-name"></div><div class="infra-song-album"></div></div>
+            <div class="infra-song-note"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--
+    ══════════════════════════════════════════════
+    PLANTILLA NUEVO ARTISTA — copia y pega antes
+    del cierre de .infra-list
+    ══════════════════════════════════════════════
+    <div class="infra-artist" id="ia5">
+      <div class="infra-header" onclick="toggleInfra('ia5')">
+        <div class="infra-num">05</div>
+        <div class="infra-artist-info">
+          <div class="infra-artist-name">Nombre del Artista</div>
+          <div class="infra-artist-genre">Género</div>
+        </div>
+        <div class="infra-toggle">Ver canciones <span class="infra-toggle-arrow">↓</span></div>
+      </div>
+      <div class="infra-songs">
+        <div class="infra-songs-inner">
+          <div class="infra-song-row">
+            <div class="infra-song-num">1</div>
+            <div class="infra-song-info"><div class="infra-song-name">Canción</div><div class="infra-song-album"></div></div>
+            <div class="infra-song-note">Nota</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    -->
+
+  </div>
+</section>
+
+<script>
+  function toggleInfra(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+</script>
+
+<!-- ====================================================
+     RESEÑAS
+     ==================================================== -->
+<section id="resenas" style="padding:0; min-height:unset;">
+  <div class="resenas-header" style="padding-top:8rem;">
+    <p class="resenas-label">✦ Sección 06</p>
+    <h2 class="resenas-title">Mis <em>Reseñas</em></h2>
+    <div class="resenas-rule"></div>
+    <p class="resenas-intro">
+      Hay canciones que merecen algo más que un "me gusta". Estas son las que me detuve a escuchar en serio — las que me obligaron a preguntarme por qué suenan así, qué dicen de verdad, qué despiertan en mí. Aquí escribo lo que pienso de ellas: sin fórmulas, sin pretensiones. Solo lo que queda después de escucharlas bien.
+    </p>
+  </div>
+
+  <div class="resenas-list">
+
+    <div class="resena-wrapper">
+      <div class="resena-card" onclick="this.classList.toggle('flipped')">
+        <div class="resena-front">
+          <div class="resena-img"><img src="Canciones_E/Elemento.jpg" alt="Elemento"></div>
+          <div class="resena-content">
+            <div class="resena-number">01</div>
+            <div class="resena-meta"><div class="resena-song-name">ELEMENTO</div><div class="resena-song-artist">Enjambre</div></div>
+            <div class="resena-sep"></div>
+            <div class="resena-quote-wrap"><span class="resena-lyric">Yo me alejo pero no te dejo de pensar...</span><span class="resena-lyric">Mi elemento vital.</span></div>
+            <div class="resena-hint">Leer reseña ↻</div>
+          </div>
+        </div>
+        <div class="resena-back">
+          <div class="resena-back-side"><div class="resena-back-side-star">✦</div><div class="resena-back-side-rule"></div><div class="resena-back-side-title">RESEÑA</div></div>
+          <div class="resena-back-content">
+            <div class="resena-back-label">ELEMENTO — ENJAMBRE</div>
+            <div class="resena-back-text"><p>Escribe aquí tu reseña completa.</p><p>Puedes hablar de la producción, la letra, cómo te llegó la primera vez, qué momento representa.</p><p>Agrega todos los párrafos que necesites.</p></div>
+            <div class="resena-back-close">↺ Volver</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!--
+    PLANTILLA RESEÑA:
+    <div class="resena-wrapper">
+      <div class="resena-card" onclick="this.classList.toggle('flipped')">
+        <div class="resena-front">
+          <div class="resena-img"><img src="RUTA" alt=""></div>
+          <div class="resena-content">
+            <div class="resena-number">0X</div>
+            <div class="resena-meta"><div class="resena-song-name">NOMBRE</div><div class="resena-song-artist">Artista</div></div>
+            <div class="resena-sep"></div>
+            <div class="resena-quote-wrap"><span class="resena-lyric">Letra.</span></div>
+            <div class="resena-hint">Leer reseña ↻</div>
+          </div>
+        </div>
+        <div class="resena-back">
+          <div class="resena-back-side"><div class="resena-back-side-star">✦</div><div class="resena-back-side-rule"></div><div class="resena-back-side-title">RESEÑA</div></div>
+          <div class="resena-back-content">
+            <div class="resena-back-label">NOMBRE — ARTISTA</div>
+            <div class="resena-back-text"><p>Tu reseña.</p></div>
+            <div class="resena-back-close">↺ Volver</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    -->
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">WBE</div>
+  <div class="footer-note"></div>
+</footer>
+
+</body>
+</html>
